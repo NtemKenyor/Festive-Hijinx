@@ -245,7 +245,9 @@
       OR
     <br/>
 
-    <a style="text-decoration: none;" href="https://flutterwave.com/pay/opv47apjhax6"></a><button style="background-color: green; color: #f4f4f4; padding: 9px; width: 50%;" id="MakePayment">Alternative Payment Method</button>  </a> 
+    <a style="text-decoration: none;" href="https://flutterwave.com/pay/opv47apjhax6" target="_blank">
+      <button style="background-color: green; color: #f4f4f4; padding: 9px; width: 50%;" id="MakePayment">Alternative Payment Method</button>
+    </a> 
     
     <br/>
   </div>
@@ -269,7 +271,7 @@
 
                 // Display the public key in the wallet section
                 walletAddress.textContent = `${publicKey}`;
-                console.log(`Private Key: ${privateKey}`); // Log the private key for debugging (optional)
+                // console.log(`Private Key: ${privateKey}`); // Log the private key for debugging (optional)
 
                 // Return the keys if needed elsewhere in the code
                 return { publicKey, privateKey };
