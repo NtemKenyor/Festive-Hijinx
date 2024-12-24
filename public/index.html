@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grinch Service</title>
+  <link rel="icon" href="../logo/logo.webp" type="image/webp">
   <link rel="icon" href="../logo/favicon.webp" type="image/webp">
 
   <style>
@@ -308,7 +309,9 @@
 <script>
   async function checkBalance(walletAddress, expectedAmount, currency) {
     try {
-      const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'));
+    //   const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'));
+      const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
+
       const publicKey = new solanaWeb3.PublicKey(walletAddress);
 
       if (currency.toUpperCase() === 'SOL') {
@@ -330,12 +333,19 @@
         });
 
         let usdtBalance = 0;
+        // Replace with the original USDT mint address on Solana mainnet
+        const USDT_MINT_ADDRESS = "Es9vMFrzaCERkH1D2yRb7FPhjX8TtSZR1Xt6D6r5fLk";
+
         for (const { account } of tokenAccounts.value) {
-          const tokenInfo = account.data.parsed.info;
-          if (tokenInfo.mint === "<USDT_MINT_ADDRESS>") { // Replace with the USDT mint address on devnet
-            usdtBalance = tokenInfo.tokenAmount.uiAmount;
-            break;
-          }
+        //   const tokenInfo = account.data.parsed.info;
+
+            // Logic to check USDT balance
+            const tokenInfo = account.data.parsed.info;
+            if (tokenInfo.mint === USDT_MINT_ADDRESS) {
+                usdtBalance = tokenInfo.tokenAmount.uiAmount;
+                break;
+            }
+
         }
 
         if (usdtBalance >= expectedAmount) {
