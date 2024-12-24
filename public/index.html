@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Grinch Service</title>
+  <link rel="icon" href="favicon.webp" type="image/webp">
+
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -196,7 +198,7 @@
     <label>Date and Time:</label>
     <input type="datetime-local" name="eventTime" required />
     <label>Venue:</label>
-    <input type="text" name="venue" required />
+    <input type="text" placeholder="Please give much details about the Venue." name="venue" required />
     <label>Personality:</label>
     <select name="personality">
       <option value="grinch">Grinch</option>
@@ -231,7 +233,7 @@
  -->
 
   <div id="walletSection" style="display:none;">
-    <p>Send payment to this address:</p>
+    <p>Send payment to your address:</p>
     <code id="walletAddress"></code>
     <br/>
     <input style="padding: 12px; border-radius: 12px; width: 80%; display: flex;"  type="text" value="Blockchain: Solana" name="amount" readonly />

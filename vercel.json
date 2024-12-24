@@ -16,6 +16,10 @@
         "dest": "/api/index.js"
       },
       {
+        "src": "/(.*)\.(jpg|jpeg|png|gif|webp|svg|css|js|ico|json)$",
+        "dest": "/public/$1"
+      },
+      {
         "src": "/(.*)",
         "dest": "/public/index.html"
       }
