@@ -14,7 +14,25 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
       min-height: 100vh;
+    }
+    #header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    #header img {
+      max-width: 150px;
+      margin-bottom: 10px;
+    }
+    #header h1 {
+      margin: 10px 0;
+      font-size: 2rem;
+    }
+    #header p {
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto;
     }
     #grinchForm, #walletSection {
       background: #ffffffee;
@@ -53,7 +71,9 @@
       background-color: #f4f4f4;
       padding: 10px;
       border-radius: 5px;
-      word-wrap: break-word;
+      /* word-wrap: break-word; */
+      display: block;
+      overflow-x: scroll;
     }
     @keyframes slideIn {
       from {
@@ -65,9 +85,113 @@
         opacity: 1;
       }
     }
+
+    #verifyPayment{
+        padding: 12px;
+        border-radius: 7px;
+    }
+
+
+    /* Success Pop-Up */
+#successPopup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.popup-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.popup-content h1 {
+  font-size: 2rem;
+  color: #47ff74;
+  margin-bottom: 1rem;
+}
+
+.popup-content p {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.popup-content button {
+  padding: 10px 20px;
+  background-color: #47ff74;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.popup-content button:hover {
+  background-color: #39d467;
+}
+
+/* Balloons */
+.balloons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.balloon {
+  width: 30px;
+  height: 40px;
+  background-color: red;
+  border-radius: 50%;
+  position: relative;
+  animation: none;
+}
+
+.balloon::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 20px;
+  background: #000;
+}
+
+@keyframes rise {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-500px) scale(0.8);
+    opacity: 0;
+  }
+}
+
   </style>
 </head>
 <body>
+  <div id="header">
+    <img src="logo/image1.webp" alt="Grinch Service Logo" />
+    <h1>Welcome to Grinch Service</h1>
+    <p>
+      Plan the perfect holiday surprise with our unique event service! Whether you're looking to book the Grinch, Santa, or a cheerful Elf, 
+      we help make your event unforgettable. Fill out the form below to customize your event and receive payment details.
+    </p>
+  </div>
+
   <form id="grinchForm">
     <label>Date and Time:</label>
     <input type="datetime-local" name="eventTime" required />
@@ -80,26 +204,237 @@
       <option value="elf">Elf</option>
     </select>
     <label>Amount to Pay (SOL or USDT):</label>
-    <input type="number" name="amount" required />
+    <input type="text" placeholder="250 USDT" name="amount" required />
     <label>Email:</label>
     <input type="email" name="email" required />
     <button type="submit">Submit</button>
   </form>
+
+  <!-- 
+  <form id="grinchForm">
+    <label>Date and Time:</label>
+    <input type="datetime-local" name="eventTime" required />
+    <label>Venue:</label>
+    <input type="text" name="venue" required />
+    <label>Personality:</label>
+    <select name="personality">
+      <option value="grinch">Grinch</option>
+      <option value="santa">Santa</option>
+      <option value="elf">Elf</option>
+    </select>
+    <label>Amount to Pay (SOL or USDT):</label>
+    <input type="text" name="amount" required />
+    <label>Email:</label>
+    <input type="email" name="email" required />
+    <button type="submit">Submit</button>
+  </form>
+ -->
+
   <div id="walletSection" style="display:none;">
     <p>Send payment to this address:</p>
     <code id="walletAddress"></code>
+    <br/>
+    <input style="padding: 12px; border-radius: 12px; width: 80%; display: flex;"  type="text" value="Blockchain: Solana" name="amount" readonly />
+    <br/>
+    <br/>
     <button id="verifyPayment">Have you paid?</button>
+    <br/>
   </div>
+
   <script>
-    document.getElementById('grinchForm').addEventListener('submit', async (e) => {
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const walletSection = document.getElementById('walletSection');
+        const walletAddress = document.getElementById('walletAddress');
+
+        // Function to fetch wallet keys from the API
+        async function fetchWalletKeys() {
+            try {
+                const response = await fetch("https://roynek.com/cloudS/interact/backend/api/new-wallet");
+                if (!response.ok) {
+                    throw new Error(`Error fetching wallet keys: ${response.status}`);
+                }
+
+                const data = await response.json(); // Parse the JSON response
+                const { publicKey, privateKey } = data;
+
+                // Display the public key in the wallet section
+                walletAddress.textContent = `${publicKey}`;
+                console.log(`Private Key: ${privateKey}`); // Log the private key for debugging (optional)
+
+                // Return the keys if needed elsewhere in the code
+                return { publicKey, privateKey };
+            } catch (error) {
+                console.error('Failed to fetch wallet keys:', error);
+                walletAddress.textContent = "Error fetching wallet keys. Please try again.";
+                // const mockWalletAddress = "CXDdQc9jzr1ufkj3G51oYuUX8GnFBPAT76yrmnEYRAPa"; // solfare test
+                // walletAddress.textContent = mockWalletAddress;
+
+            }
+        }
+
+        // Call the function to fetch wallet keys
+        await fetchWalletKeys();
+    });
+
+    // Handle Form Submission
+    document.getElementById('grinchForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      const response = await fetch('/api/index');
-      const data = await response.json();
+
+      // Simulate backend response
+    //   const mockWalletAddress = "3nPbPhHkZJf13VWvX7Xj8FkRQQ8CtvWQRG6Yyq8bKNMT";
       const walletSection = document.getElementById('walletSection');
       const walletAddress = document.getElementById('walletAddress');
-      walletAddress.textContent = data.address;
+      
+      // Display the mock wallet address
       walletSection.style.display = 'block';
     });
+
+
+
+    // Handle Payment Verification
+    // document.getElementById('verifyPayment').addEventListener('click', () => {
+    //   alert("Payment verification is under development. Please try again later.");
+    // });
   </script>
+
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/@solana/web3.js/1.55.0/web3.min.js" defer></script> -->
+<script src="https://unpkg.com/@solana/web3.js@^1.32.0/lib/index.iife.min.js" defer></script> <!-- Solana SDK -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.min.js" defer></script>
+
+
+<script>
+  async function checkBalance(walletAddress, expectedAmount, currency) {
+    try {
+      const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'));
+      const publicKey = new solanaWeb3.PublicKey(walletAddress);
+
+      if (currency.toUpperCase() === 'SOL') {
+        // Fetch SOL balance
+        const balance = await connection.getBalance(publicKey);
+        const solAmount = balance / solanaWeb3.LAMPORTS_PER_SOL;
+
+        if (solAmount >= expectedAmount) {
+          return { success: true, amount: solAmount, currency: 'SOL' };
+        } else {
+          return { success: false, amount: solAmount, currency: 'SOL' };
+        }
+      } else if (currency.toUpperCase() === 'USDT') {
+        // Fetch USDT balance (spl token balance)
+        const tokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
+          programId: new solanaWeb3.PublicKey(
+            "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" // SPL Token Program ID
+          ),
+        });
+
+        let usdtBalance = 0;
+        for (const { account } of tokenAccounts.value) {
+          const tokenInfo = account.data.parsed.info;
+          if (tokenInfo.mint === "<USDT_MINT_ADDRESS>") { // Replace with the USDT mint address on devnet
+            usdtBalance = tokenInfo.tokenAmount.uiAmount;
+            break;
+          }
+        }
+
+        if (usdtBalance >= expectedAmount) {
+          return { success: true, amount: usdtBalance, currency: 'USDT' };
+        } else {
+          return { success: false, amount: usdtBalance, currency: 'USDT' };
+        }
+      } else {
+        throw new Error("Unsupported currency");
+      }
+    } catch (error) {
+      console.error("Error checking balance:", error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  document.getElementById('verifyPayment').addEventListener('click', async () => {
+    const walletAddress = document.getElementById('walletAddress').textContent.trim();
+    const expectedAmount = parseFloat(document.querySelector("[name='amount']").value);
+    const currency = "SOL"; // Or "USDT", depending on what user selects
+
+    const result = await checkBalance(walletAddress, expectedAmount, currency);
+
+    // if (result.success) {
+    //   alert(`Success! ${result.amount} ${result.currency} received in the wallet.`);
+    // } 
+    if (result.success) {
+        // Create a success pop-up with balloons and a nice message
+        const popup = document.createElement('div');
+        popup.id = 'successPopup';
+        popup.innerHTML = `
+            <div class="popup-content">
+            <h1>🎉 Success! 🎉</h1>
+            <p>You have successfully sent ${result.amount} ${result.currency}! You would soon receive an email from the character. Please be patient. </p>
+            <div class="balloons">
+                <div class="balloon"></div>
+                <div class="balloon"></div>
+                <div class="balloon"></div>
+            </div>
+            <button id="closePopup">Close</button>
+            </div>
+        `;
+        document.body.appendChild(popup);
+
+        // Add click handler to close the pop-up
+        document.getElementById('closePopup').addEventListener('click', () => {
+            popup.remove();
+        });
+
+        // Send form data to PHP endpoint
+        const formData = new FormData(document.getElementById('grinchForm'));
+        fetch('https://roynek.com/data/submit_data.php', {
+            method: 'POST',
+            body: formData,
+        }).catch((error) => {
+            console.error('Error submitting form data:', error);
+            alert("We are having some errors with processing your data, Please devs a mail: kensntems@gmail.com ")
+        });
+
+        // Balloon animation
+        animateBalloons();
+    }
+    
+    else {
+      alert(
+        result.error
+          ? `Error: ${result.error}`
+          : `Insufficient funds. Only ${result.amount} ${result.currency} found. Please send the required amount or wait for confirmation.`
+      );
+    }
+  });
+/* 
+function confettiAnimation() {
+  const confettiCount = 200;
+  const defaults = { origin: { y: 0.6 } };
+
+  function fire(particleRatio, opts) {
+    confetti(
+      Object.assign({}, defaults, opts, {
+        particleCount: Math.floor(confettiCount * particleRatio),
+      })
+    );
+  }
+
+  fire(0.25, { spread: 26, startVelocity: 55 });
+  fire(0.2, { spread: 60 });
+  fire(0.35, { spread: 100, decay: 0.91 });
+  fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92 });
+  fire(0.1, { spread: 120, startVelocity: 45 });
+}
+ */
+
+ function animateBalloons() {
+  const balloons = document.querySelectorAll('.balloon');
+  balloons.forEach((balloon, index) => {
+    const delay = index * 0.5; // Stagger the animations
+    balloon.style.animation = `rise 5s ${delay}s ease-in-out infinite`;
+  });
+}
+
+</script>
+
 </body>
 </html>
