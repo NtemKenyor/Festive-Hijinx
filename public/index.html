@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grinch Service</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(120deg, #ff4747, #47ff74);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    #grinchForm, #walletSection {
+      background: #ffffffee;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      max-width: 400px;
+      width: 100%;
+      color: #333;
+      animation: slideIn 1s ease-out;
+    }
+    #grinchForm label, #walletSection p {
+      font-weight: bold;
+      display: block;
+      margin: 10px 0 5px;
+    }
+    #grinchForm input, #grinchForm select, #grinchForm button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    #grinchForm button, #walletSection button {
+      background-color: #ff4747;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    #grinchForm button:hover, #walletSection button:hover {
+      background-color: #ff6161;
+    }
+    #walletAddress {
+      font-family: 'Courier New', Courier, monospace;
+      background-color: #f4f4f4;
+      padding: 10px;
+      border-radius: 5px;
+      word-wrap: break-word;
+    }
+    @keyframes slideIn {
+      from {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <form id="grinchForm">
+    <label>Date and Time:</label>
+    <input type="datetime-local" name="eventTime" required />
+    <label>Venue:</label>
+    <input type="text" name="venue" required />
+    <label>Personality:</label>
+    <select name="personality">
+      <option value="grinch">Grinch</option>
+      <option value="santa">Santa</option>
+      <option value="elf">Elf</option>
+    </select>
+    <label>Amount to Pay (SOL or USDT):</label>
+    <input type="number" name="amount" required />
+    <label>Email:</label>
+    <input type="email" name="email" required />
+    <button type="submit">Submit</button>
+  </form>
+  <div id="walletSection" style="display:none;">
+    <p>Send payment to this address:</p>
+    <code id="walletAddress"></code>
+    <button id="verifyPayment">Have you paid?</button>
+  </div>
+  <script>
+    document.getElementById('grinchForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const response = await fetch('/api/index');
+      const data = await response.json();
+      const walletSection = document.getElementById('walletSection');
+      const walletAddress = document.getElementById('walletAddress');
+      walletAddress.textContent = data.address;
+      walletSection.style.display = 'block';
+    });
+  </script>
+</body>
+</html>
