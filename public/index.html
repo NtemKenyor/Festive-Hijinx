@@ -242,6 +242,12 @@
     <br/>
     <button id="verifyPayment">Have you paid?</button>
     <br/>
+      OR
+    <br/>
+
+    <a style="text-decoration: none;" href="https://flutterwave.com/pay/opv47apjhax6"></a><button style="background-color: green; color: #f4f4f4; padding: 9px; width: 50%;" id="MakePayment">Alternative Payment Method</button>  </a> 
+    
+    <br/>
   </div>
 
   <script>
@@ -283,6 +289,17 @@
     // Handle Form Submission
     document.getElementById('grinchForm').addEventListener('submit', (e) => {
       e.preventDefault();
+
+      // send to the backend
+      // Send form data to PHP endpoint
+      const formData = new FormData(document.getElementById('grinchForm'));
+      fetch('https://roynek.com/data/submit_data.php', {
+          method: 'POST',
+          body: formData,
+      }).catch((error) => {
+          console.error('Error submitting form data:', error);
+          // alert("We are having some errors with processing your data, Please devs a mail: kensntems@gmail.com ")
+      });
 
       // Simulate backend response
     //   const mockWalletAddress = "3nPbPhHkZJf13VWvX7Xj8FkRQQ8CtvWQRG6Yyq8bKNMT";
@@ -417,6 +434,24 @@
       );
     }
   });
+
+
+
+  document.getElementById('MakePayment').addEventListener('click', async () => {
+    // const walletAddress = document.getElementById('walletAddress').textContent.trim();
+    // const expectedAmount = parseFloat(document.querySelector("[name='amount']").value);
+    // const currency = "SOL"; // Or "USDT", depending on what user selects
+
+    // const result = await checkBalance(walletAddress, expectedAmount, currency);
+
+    
+
+    
+  });
+
+
+  
+
 /* 
 function confettiAnimation() {
   const confettiCount = 200;
